@@ -20,6 +20,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # --- ESTE É O PASSO NOVO E CORRIGIDO ---
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      # -------------------------------------
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -28,17 +33,14 @@ jobs:
       - name: Install Python Dependencies
         run: pip install -r requirements.txt
 
-      # A autenticação do Google continua exatamente igual
       - name: Authenticate to Google Sheets
         env:
           GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: echo "$GOOGLE_CREDS" > gcreds.json
       
-      # Esta é a nova parte: uma única ação para renderizar E publicar
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
-          # O arquivo exato que queremos renderizar
           target: horarios-2025-2.ipynb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
