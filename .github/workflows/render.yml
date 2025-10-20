@@ -9,11 +9,10 @@ on:
       - main
       - master
 
-# Define permissões para o job
 permissions:
   contents: read
-  pages: write      # Permissão para publicar no GitHub Pages
-  id-token: write   # Permissão para autenticar a publicação
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
@@ -38,19 +37,22 @@ jobs:
           GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: echo "$GOOGLE_CREDS" > gcreds.json
 
-      # --- ETAPA DE RENDERIZAÇÃO MANUAL ---
       - name: Render Quarto Notebook
         run: quarto render horarios-2025-2.ipynb --to html
 
-      # --- ETAPA DE PUBLICAÇÃO MANUAL ---
-      # 1. Carrega o HTML gerado como um "artefato"
+      # --- ESTE É O NOVO PASSO QUE CORRIGE O ERRO ---
+      - name: Prepare artifact directory
+        run: |
+          mkdir _site
+          mv horarios-2025-2.html _site/index.html
+      # --------------------------------------------
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # O Quarto renderiza o .ipynb com o mesmo nome, mudando a extensão
-          path: 'horarios-2025-2.html'
+          # Agora estamos enviando a PASTA, como a ação espera
+          path: '_site' 
           
-      # 2. Faz o deploy do artefato para o GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
