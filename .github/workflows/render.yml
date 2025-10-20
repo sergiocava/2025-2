@@ -3,7 +3,7 @@ name: Renderizar e Publicar Horários
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *' # Roda a cada 6 horas
+    - cron: '0 */6 * * *'
   push:
     branches:
       - main
@@ -20,10 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # --- ESTE É O PASSO NOVO E CORRIGIDO ---
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
-      # -------------------------------------
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,10 +35,17 @@ jobs:
         env:
           GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: echo "$GOOGLE_CREDS" > gcreds.json
+
+      # --- NOVO PASSO DE DEBUG ---
+      # Este comando vai listar todos os arquivos no diretório
+      - name: List files in directory
+        run: ls -l
+      # -------------------------
       
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
-          target: horarios-2025-2.ipynb
+          # Verifique se este nome bate 100% com o nome do seu arquivo
+          target: horarios-2025-2.ipynb 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
