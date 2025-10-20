@@ -1,0 +1,77 @@
+# 1. Nome do Workflow (para você identificar na aba "Actions")
+name: Renderizar e Publicar Horários
+
+# 2. Gatilhos (Quando rodar)
+on:
+  # Permite que você rode manualmente pela aba "Actions"
+  workflow_dispatch:
+  
+  # Roda automaticamente em um cronograma (ex: a cada 6 horas)
+  schedule:
+    - cron: '0 */6 * * *' # 'minuto hora dia mês dia-da-semana'
+
+  # Também roda toda vez que você envia ("push") uma mudança para o branch "main"
+  push:
+    branches:
+      - main
+      - master
+
+# 3. Permissões
+permissions:
+  contents: write  # Permissão para o robô escrever no repositório (necessário para o gh-pages)
+  pages: write     # Permissão para publicar no GitHub Pages
+  id-token: write  # Permissão para autenticar a publicação
+
+# 4. Tarefas (O que fazer)
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Rodar em uma máquina virtual Linux
+    
+    steps:
+      # 4.1. Baixa o código do seu repositório (seu .ipynb, requirements.txt, etc.)
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 4.2. Instala o Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # Você pode mudar a versão se precisar
+
+      # 4.3. Instala o Quarto
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # 4.4. Instala as bibliotecas do seu requirements.txt
+      - name: Install Python Dependencies
+        run: pip install -r requirements.txt
+
+      # 4.5. Cria o arquivo de credencial do Google
+      # Esta é a parte importante! Ele pega o "Secret" e salva no arquivo gcreds.json
+      - name: Authenticate to Google Sheets
+        env:
+          # GOOGLE_CREDENTIALS é o nome do "Secret" que você criou
+          GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: echo "$GOOGLE_CREDS" > gcreds.json
+
+      # 4.6. Roda o Quarto para renderizar o .ipynb para .html
+      - name: Render Quarto Project
+        run: quarto render horarios-2025-2.ipynb --to html
+
+      # 4.7. Publica o resultado no GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: _site/ # O Quarto por padrão salva o HTML aqui quando renderiza um projeto
+          retention-days: 1
+          
+  # Tarefa separada para fazer o "deploy"
+  deploy:
+    needs: build-and-deploy # Só roda depois que o "build" terminar
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
