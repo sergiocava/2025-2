@@ -38,7 +38,7 @@ jobs:
         run: echo "$GOOGLE_CREDS" > gcreds.json
 
       - name: Render Quarto Notebook
-        run: quarto render horarios-2025-2.ipynb --to html
+        run: quarto render horarios-2025-2.ipynb --to html --no-cache
 
       # --- ESTE É O NOVO PASSO QUE CORRIGE O ERRO ---
       - name: Prepare artifact directory
