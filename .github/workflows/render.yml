@@ -37,6 +37,9 @@ jobs:
           GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: echo "$GOOGLE_CREDS" > gcreds.json
 
+      - name: Clear gspread cache
+        run: rm -rf ~/.config/gspread
+
       - name: Render Quarto Notebook
         run: quarto render horarios-2025-2.ipynb --to html --no-cache
 
