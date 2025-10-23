@@ -33,10 +33,16 @@ jupyter: python3
 # | results: 'asis' 
 # | echo: false
 
-# Importa o seu novo script
+# Importa o seu script
 import processar_horarios
 
-# Chama a função principal e imprime o HTML bruto
+# Importa as funções de display do IPython
+from IPython.display import display, HTML
+
+# Chama a função principal que retorna a string HTML
 html_das_tabelas = processar_horarios.gerar_html_todas_tabelas()
-print(html_das_tabelas)
+
+# Usa display(HTML(...)) para renderizar a string como HTML bruto
+# Esta é a mudança principal
+display(HTML(html_das_tabelas))
 ```
