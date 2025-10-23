@@ -41,7 +41,7 @@ jobs:
         run: rm -rf ~/.config/gspread
 
       - name: Render Quarto Notebook
-        run: quarto render horarios-2025-2.ipynb --to html --no-cache --execute
+        run: quarto render horarios-2025-2.qmd --to html --no-cache --execute
 
       # --- ESTE É O NOVO PASSO QUE CORRIGE O ERRO ---
       - name: Prepare artifact directory
