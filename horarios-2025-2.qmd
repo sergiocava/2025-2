@@ -35,7 +35,8 @@ jupyter: python3
 
 # Importa o seu novo script
 import processar_horarios
-``` 
+
 # Chama a função principal e imprime o HTML bruto
 html_das_tabelas = processar_horarios.gerar_html_todas_tabelas()
 print(html_das_tabelas)
+```
